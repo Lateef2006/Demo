@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Country, State, and City</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .form-card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            background-color: #fff;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            font-weight: bold;
+            width: 150px;
+            text-align: right;
+            margin-right: 10px;
+        }
+        .form-group select {
+            padding: 8px;
+            font-size: 14px;
+            width: 250px;
+        }
+        .dropdown-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-card">
+        <h2>Select Country, State, and City</h2>
+        <form action="#" method="GET">
+            <div class="dropdown-container">
+                <div class="form-group">
+                    <label for="country">Select Country:</label>
+                    <select id="country" name="country">
+                        <option value="">Select Country</option>
+                        <!-- Country options populated dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="state">Select State:</label>
+                    <select id="state" name="state">
+                        <option value="">Select State</option>
+                        <!-- State options populated dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="city">Select City:</label>
+                    <select id="city" name="city">
+                        <option value="">Select City</option>
+                        <!-- City options populated dynamically -->
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Fetch countries, states, and cities dynamically
+        fetch('/countries/getallcountries')
+            .then(response => response.json())
+            .then(data => {
+                const countrySelect = document.getElementById('country');
+                data.forEach(country => {
+                    const option = document.createElement('option');
+                    option.value = country.countryCode;
+                    option.textContent = country.countryName;
+                    countrySelect.appendChild(option);
+                });
+            });
+
+        document.getElementById('country').addEventListener('change', function () {
+            const countryCode = this.value;
+            fetch(`/states/getallstates?countryCode=${countryCode}`)
+                .then(response => response.json())
+                .then(data => {
+                    const stateSelect = document.getElementById('state');
+                    stateSelect.innerHTML = '<option value="">Select State</option>'; // Clear previous options
+                    data.forEach(state => {
+                        const option = document.createElement('option');
+                        option.value = state.stateCode;
+                        option.textContent = state.stateName;
+                        stateSelect.appendChild(option);
+                    });
+                });
+        });
+
+        document.getElementById('state').addEventListener('change', function () {
+            const stateCode = this.value;
+            fetch(`/cities/getallcities?stateCode=${stateCode}`)
+                .then(response => response.json())
+                .then(data => {
+                    const citySelect = document.getElementById('city');
+                    citySelect.innerHTML = '<option value="">Select City</option>'; // Clear previous options
+                    data.forEach(city => {
+                        const option = document.createElement('option');
+                        option.value = city.cityCode;
+                        option.textContent = city.cityName;
+                        citySelect.appendChild(option);
+                    });
+                });
+        });
+    </script>
+</body>
+</html>
